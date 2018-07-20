@@ -65,7 +65,7 @@ $ docker run -it --rm --link rgmp:postgres postgres:alpine psql -h postgres -U p
 =# \q
 ```
 
-### Testing
+## Testing
 
 * TestEmptyTable - expected is a 200 code, but response returns 404
 * TestGetNonExistentProduct - a GET request for a product by id should return error
@@ -88,7 +88,7 @@ Alternatively, run `test_exec.sh` to start a Docker test database, execute the t
 $ bash ./test_exec.sh
 ```
 
-### Build and run the application
+## Build and run the application
 
 ```
 $ go build
@@ -98,8 +98,8 @@ $ curl -X GET http://localhost:8080/products
 ```
 
 ## TODO
-* doesn't error out when connection fails
 * doesn't log address on which it's available
+* no logging provide of normal application operation
 
 ## GoDoc
 * database/sql: https://golang.org/pkg/database/sql/
@@ -108,6 +108,7 @@ $ curl -X GET http://localhost:8080/products
 * net/http: https://godoc.org/net/http
 
 ## References
+* Original SemaphoreCI tutorial and codebase: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql
 * database/sql tutorial: http://go-database-sql.org/
 * JSON encoding/decoding: https://blog.golang.org/json-and-go
 * when running a db unencrypted, include 'sslmode=disable' in connection string: https://stackoverflow.com/questions/21959148/ssl-is-not-enabled-on-the-server
