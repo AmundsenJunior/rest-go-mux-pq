@@ -18,11 +18,16 @@ type App struct {
 }
 
 // create database connection and set up routing
-func (a *App) Initialize(user, password, dbname, sslmode string) {
-	connectionString := fmt.Sprintf("postgres://%s:%s@%s?sslmode=%s", user, password, dbname, sslmode)
+func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", user, password, dbname, host, port, sslmode)
 
 	var err error
-	a.DB, err = sql.Open("postgres", connectionString)
+	a.DB, err = sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = a.DB.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,6 +39,8 @@ func (a *App) Initialize(user, password, dbname, sslmode string) {
 // run application
 func (a *App) Run(addr string) {
 	log.Fatal(http.ListenAndServe(addr, a.Router))
+
+	defer a.DB.Close()
 }
 
 // initialize routes into router that call methods on requests
@@ -64,7 +71,8 @@ func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid product ID")
+		msg := fmt.Sprintf("Invalid product ID. Error: %s", err.Error())
+		respondWithError(w, http.StatusBadRequest, msg)
 		return
 	}
 
@@ -72,7 +80,8 @@ func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	if err := p.getProduct(a.DB); err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			respondWithError(w, http.StatusNotFound, "Product not found")
+			msg := fmt.Sprintf("Product not found. Error: %s", err.Error())
+			respondWithError(w, http.StatusNotFound, msg)
 		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 		}
@@ -106,7 +115,8 @@ func (a *App) createProduct(w http.ResponseWriter, r *http.Request) {
 	var p product
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&p); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		msg := fmt.Sprintf("Invalid request payload. Error: %s", err.Error())
+		respondWithError(w, http.StatusBadRequest, msg)
 		return
 	}
 	defer r.Body.Close()
@@ -125,14 +135,16 @@ func (a *App) updateProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid product ID")
+		msg := fmt.Sprintf("Invalid product ID. Error: %s", err.Error())
+		respondWithError(w, http.StatusBadRequest, msg)
 		return
 	}
 	p.ID = id
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&p); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		msg := fmt.Sprintf("Invalid request payload. Error: %s", err.Error())
+		respondWithError(w, http.StatusBadRequest, msg)
 		return
 	}
 	defer r.Body.Close()
@@ -151,7 +163,8 @@ func (a *App) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid product ID")
+		msg := fmt.Sprintf("Invalid product ID. Error: %s", err.Error())
+		respondWithError(w, http.StatusBadRequest, msg)
 		return
 	}
 	p.ID = id

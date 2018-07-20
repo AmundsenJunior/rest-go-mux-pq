@@ -86,6 +86,8 @@ func TestMain(m *testing.M) {
 		os.Getenv("TEST_DB_USERNAME"),
 		os.Getenv("TEST_DB_PASSWORD"),
 		os.Getenv("TEST_DB_NAME"),
+		os.Getenv("TEST_DB_HOST"),
+		os.Getenv("TEST_DB_PORT"),
 		os.Getenv("TEST_DB_SSLMODE"),
 	)
 
