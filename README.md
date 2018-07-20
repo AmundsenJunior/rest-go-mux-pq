@@ -5,6 +5,13 @@
 
 ___Source: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql___
 
+## Project structure
+`app.go main.go model.go`
+
+* `app.go` - App type to provide REST web service endpoints and model calls
+* `main.go` - main package to run service
+* `model.go` - defines products database model and executes CRUD operations against database
+
 ## CRUD of products
 * create a new product: POST to /product
 * delete an existing product: DELETE to /product/{id}
@@ -12,16 +19,34 @@ ___Source: https://semaphoreci.com/community/tutorials/building-and-testing-a-re
 * fetch an existing product: GET to /product/{id}
 * fetch a list of all existing products: GET to /products
 
-create project workspace
-`$ cd ~/dev/go/github.com/amundsenjunior/rest-go-mux-pq`
+## Setup Development Environment
 
-get Go dependencies
-`$ go get github.com/gorilla/mux github.com/lib/pq`
+### Create project workspace
 
-Start PostgreSQL instance and create database & table
+```
+$ cd ~/dev/go/github.com/amundsenjunior/rest-go-mux-pq
+$ git clone https://github.com/amundsenjunior/rest-go-mux-pq.git
+```
+
+### Get project dependencies
+
+You can pull the two dependencies directly, via:
+
+```
+$ go get github.com/gorilla/mux github.com/lib/pq
+```
+
+Or, using `go dep` (`go get -u github.com/golang/dep/cmd/dep`), use the present `Gopkg.*` files:
+
+```
+$ dep ensure
+```
+
+### Start PostgreSQL instance and create database & table
 * https://hub.docker.com/_/postgres/
 * https://www.postgresql.org/docs/9.2/static/app-psql.html
 * https://www.tutorialspoint.com/postgresql/postgresql_create_database.htm
+
 ```
 $ docker run --name rgmp -d -e POSTGRES_PASSWORD=restgomuxpq -p 5432:5432 postgres:alpine
 $ docker run -it --rm --link rgmp:postgres postgres:alpine psql -h postgres -U postgres -W
@@ -40,31 +65,36 @@ $ docker run -it --rm --link rgmp:postgres postgres:alpine psql -h postgres -U p
 =# \q
 ```
 
-create application structure
-`$ touch app.go main.go main_test.go model.go`
+### Testing
 
-define App type to hold application
-define main package to run service
-define products database model
+* TestEmptyTable - expected is a 200 code, but response returns 404
+* TestGetNonExistentProduct - a GET request for a product by id should return error
+* TestCreateProduct - an OK response code should come from a POST request of a new product
+* TestGetProduct - an OK response code should come from a GET request on an existing product
+* TestGetAllProducts - an OK response code and correct length of response body shoudl come from a GET request on all existing products
+* TestUpdateProduct - an OK response code should come from a PUT request on an existing product to update it
+* TestDeleteProduct - an OK response code should come from a DELETE request on removing an existing product
 
-start writing tests with test database
-include pre-testing database setup and post-testing database cleanup
 
-execute TestMain with env vars
-`$ export TEST_DB_USERNAME=postgres TEST_DB_PASSWORD=restgomuxpq TEST_DB_NAME=docker:5432/rgmp TEST_DB_SSLMODE=disable; go test -v`
+Execute TestMain with env vars:
 
-1. add and execute TestEmptyTable, where expected is a 200 code, but response returns 404
-1. add and execute TestGetNonExistentProduct, where a GET request for a product by id should return error
-1. add and execute TestCreateProduct, where an OK response code should come from a POST request of a new product
-1. add and execute TestGetProduct, where an OK response code should come from a GET request on an existing product
-1. add and execute TestGetAllProducts, where an OK response code and correct length of response body shoudl come from a GET request on all existing products
-1. add and execute TestUpdateProduct, where an OK response code should come from a PUT request on an existing product to update it
-1. add and execute TestDeleteProduct, where an OK response code should come from a DELETE request on removing an existing product
-
-execute application with env vars
 ```
-$ export APP_DB_USERNAME=postgres APP_DB_PASSWORD=restgomuxpq APP_DB_NAME=docker:5432/rgmp APP_DB_SSLMODE=disable; go run main.go app.go model.go
-$ go build; export APP_DB_USERNAME=postgres APP_DB_PASSWORD=restgomuxpq APP_DB_NAME=docker:5432/rgmp APP_DB_SSLMODE=disable; ./rest-go-mux-pq
+$ export TEST_DB_USERNAME=postgres TEST_DB_PASSWORD=restgomuxpq TEST_DB_NAME=docker:5432/rgmp TEST_DB_SSLMODE=disable; go test -v
+```
+
+Alternatively, run `test_exec.sh` to start a Docker test database, execute the tests, and cleanup:
+
+```
+$ bash ./test_exec.sh
+```
+
+### Build and run the application
+
+```
+$ go build
+$ export APP_DB_USERNAME=postgres APP_DB_PASSWORD=restgomuxpq APP_DB_NAME=docker:5432/rgmp APP_DB_SSLMODE=disable; ./rest-go-mux-pq
+$ curl - POST -H "Content-Type: application/json" -d '{"name": "toy gorilla", "price": "29.99"}' http://localhost:8080/product
+$ curl -X GET http://localhost:8080/products
 ```
 
 ## TODO
