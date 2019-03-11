@@ -24,7 +24,7 @@ ___Source: https://semaphoreci.com/community/tutorials/building-and-testing-a-re
 ### Create project workspace
 
 ```
-$ cd ~/dev/go/github.com/amundsenjunior/rest-go-mux-pq
+$ cd $GOPATH/src/github.com/amundsenjunior/rest-go-mux-pq
 $ git clone https://github.com/amundsenjunior/rest-go-mux-pq.git
 ```
 
