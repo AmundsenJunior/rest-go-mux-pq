@@ -262,3 +262,27 @@ func TestDeleteProduct(t *testing.T) {
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
 
+func BenchmarkGetProducts(b *testing.B) {
+	clearTable()
+	addProducts(1)
+
+	req, _ := http.NewRequest("GET", "/products", nil)
+	response := executeRequest(req)
+
+	if response.Code != http.StatusOK {
+		b.Errorf("Expected response code is %d. Got %d", http.StatusOK, response.Code)
+	}
+}
+
+func BenchmarkCreateProduct(b *testing.B) {
+	clearTable()
+
+	payload := []byte(`{"name": "benchmark product","price": 23.57}`)
+
+	req, _ := http.NewRequest("POST", "/product", bytes.NewBuffer(payload))
+	response := executeRequest(req)
+
+	if  response.Code != http.StatusCreated {
+		b.Errorf("Expected response code is %d. Got %d", http.StatusCreated, response.Code)
+	}
+}
