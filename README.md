@@ -98,8 +98,10 @@ $ bash ./test_exec.sh
 ## GoDoc
 * database/sql: https://golang.org/pkg/database/sql/
 * gorilla/mux: http://www.gorillatoolkit.org/pkg/mux
+* gorilla/handlers: http://www.gorillatoolkit.org/pkg/handlers
 * testing: https://golang.org/pkg/testing/
 * net/http: https://godoc.org/net/http
+* log: https://golang.org/pkg/log
 
 ## References
 * Original SemaphoreCI tutorial and codebase: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql
@@ -108,3 +110,4 @@ $ bash ./test_exec.sh
 * when running a db unencrypted, include 'sslmode=disable' in connection string: https://stackoverflow.com/questions/21959148/ssl-is-not-enabled-on-the-server
 * don't do local/relative imports: https://stackoverflow.com/questions/30885098/go-local-import-in-non-local-package
 * when using 'go run' of multiple-file package, name all files in command: https://stackoverflow.com/questions/28153203/golang-undefined-function-declared-in-another-file
+
