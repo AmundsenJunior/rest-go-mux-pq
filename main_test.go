@@ -1,9 +1,8 @@
-package main_test
+package main
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/amundsenjunior/rest-go-mux-pq"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -27,7 +26,7 @@ const (
 )
 
 // global var that represents application we want to test
-var a main.App
+var a App
 
 // create table if it doesn't exist
 func ensureTableExists() {
@@ -79,7 +78,7 @@ func getProductByID(id int) (string, float64) {
 }
 
 func TestMain(m *testing.M) {
-	a = main.App{}
+	a = App{}
 
 	// assume that env vars are present for db credentials
 	a.Initialize(
@@ -100,6 +99,21 @@ func TestMain(m *testing.M) {
 
 	os.Exit(code)
 }
+
+// test that health status works
+func TestHealthStatus(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/health", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	var m map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &m)
+
+	dbStatus := m["dbStatus"]
+	if dbStatus != "OK" {
+		t.Errorf("Expected an OK status for DB. Got %v", dbStatus)
+	}}
 
 // test that an empty table returns empty products
 func TestEmptyTable(t *testing.T) {
@@ -127,8 +141,10 @@ func TestGetNonExistentProduct(t *testing.T) {
 
 	var m map[string]string
 	json.Unmarshal(response.Body.Bytes(), &m)
-	if m["error"] != "Product not found" {
-		t.Errorf("Expected the 'error' key of the response to be set to 'Product not found'. Got '%s'", m["error"])
+
+	errorMsg := "Product not found. Error: sql: no rows in result set"
+	if m["error"] != errorMsg {
+		t.Errorf("Expected the 'error' key of the response to be set to %s. Got '%s'", errorMsg, m["error"])
 	}
 }
 

@@ -6,8 +6,6 @@
 ___Source: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql___
 
 ## Project structure
-`app.go main.go model.go`
-
 * `app.go` - App type to provide REST web service endpoints and model calls
 * `main.go` - main package to run service
 * `model.go` - defines products database model and executes CRUD operations against database
@@ -24,7 +22,6 @@ ___Source: https://semaphoreci.com/community/tutorials/building-and-testing-a-re
 ### Create project workspace
 
 ```
-$ cd $GOPATH/src/github.com/amundsenjunior/rest-go-mux-pq
 $ git clone https://github.com/amundsenjunior/rest-go-mux-pq.git
 ```
 
@@ -36,10 +33,10 @@ You can pull the two dependencies directly, via:
 $ go get github.com/gorilla/mux github.com/lib/pq
 ```
 
-Or, using `go dep` (`go get -u github.com/golang/dep/cmd/dep`), use the present `Gopkg.*` files:
+Or, if using Go 1.11+, use `go mod` and the present `go.mod` and `go.sum` files:
 
 ```
-$ dep ensure
+$ go mod download 
 ```
 
 ### Start PostgreSQL instance and create database & table
@@ -65,8 +62,18 @@ $ docker run -it --rm --link rgmp:postgres postgres:alpine psql -h postgres -U p
 =# \q
 ```
 
+## Build and run the application
+
+```
+$ go build
+$ export DB_USERNAME=postgres DB_PASSWORD=restgomuxpq DB_NAME=rgmp DB_HOST=localhost DB_PORT=5432 DB_SSLMODE=disable; ./rest-go-mux-pq
+$ curl - POST -H "Content-Type: application/json" -d '{"name": "toy gorilla", "price": "29.99"}' http://localhost:8080/product
+$ curl -X GET http://localhost:8080/products
+```
+
 ## Testing
 
+* TestHealthStatus - expected is an OK and JSON health content
 * TestEmptyTable - expected is a 200 code, but response returns 404
 * TestGetNonExistentProduct - a GET request for a product by id should return error
 * TestCreateProduct - an OK response code should come from a POST request of a new product
@@ -79,7 +86,7 @@ $ docker run -it --rm --link rgmp:postgres postgres:alpine psql -h postgres -U p
 Execute TestMain with env vars:
 
 ```
-$ export TEST_DB_USERNAME=postgres TEST_DB_PASSWORD=restgomuxpq TEST_DB_NAME=docker:5432/rgmp TEST_DB_SSLMODE=disable; go test -v
+$ export TEST_DB_USERNAME=postgres TEST_DB_PASSWORD=restgomuxpq TEST_DB_NAME=rgmp TEST_DB_HOST=localhost TEST_DB_PORT=5432 TEST_DB_SSLMODE=disable; go test -v
 ```
 
 Alternatively, run `test_exec.sh` to start a Docker test database, execute the tests, and cleanup:
@@ -87,19 +94,6 @@ Alternatively, run `test_exec.sh` to start a Docker test database, execute the t
 ```
 $ bash ./test_exec.sh
 ```
-
-## Build and run the application
-
-```
-$ go build
-$ export APP_DB_USERNAME=postgres APP_DB_PASSWORD=restgomuxpq APP_DB_NAME=docker:5432/rgmp APP_DB_SSLMODE=disable; ./rest-go-mux-pq
-$ curl - POST -H "Content-Type: application/json" -d '{"name": "toy gorilla", "price": "29.99"}' http://localhost:8080/product
-$ curl -X GET http://localhost:8080/products
-```
-
-## TODO
-* doesn't log address on which it's available
-* no logging provide of normal application operation
 
 ## GoDoc
 * database/sql: https://golang.org/pkg/database/sql/

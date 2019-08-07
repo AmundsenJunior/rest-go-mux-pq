@@ -45,6 +45,7 @@ func (a *App) Run(addr string) {
 
 // initialize routes into router that call methods on requests
 func (a *App) initializeRoutes() {
+	a.Router.HandleFunc("/health", a.healthStatus).Methods("GET")
 	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
 	a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
@@ -64,6 +65,18 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 // send a JSON error message
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
+}
+
+// provide health status check
+func (a *App) healthStatus(w http.ResponseWriter, r *http.Request) {
+	dbStatus := "OK"
+	err := a.DB.Ping()
+	if err != nil {
+		dbStatus = fmt.Sprintf("DB access error: %s", err)
+	}
+
+	healthStatus := struct{DbStatus string `json:"dbStatus"`}{dbStatus}
+	respondWithJSON(w, http.StatusOK, healthStatus)
 }
 
 // handle get product request
