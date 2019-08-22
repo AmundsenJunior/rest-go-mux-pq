@@ -8,14 +8,14 @@ services:
     networks:
       - rgmp
     build:
-      context: ./docker/rgmp
+      context: .
     ports:
       - "8000:8000"
     depends_on:
       - postgres
     environment:
       DB_USER: postgres
-      DB_PASSWORD: restgomuxpq
+      DB_PASSWORD: ${DB_PASSWORD-restgomuxpq}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: postgres
@@ -29,7 +29,7 @@ services:
     build:
       context: ./docker/postgres
     environment:
-      POSTGRES_PASSWORD: restgomuxpq
+      POSTGRES_PASSWORD: ${DB_PASSWORD-restgomuxpq}
 
 networks:
   rgmp:

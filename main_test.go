@@ -113,7 +113,8 @@ func TestHealthStatus(t *testing.T) {
 	dbStatus := m["dbStatus"]
 	if dbStatus != "OK" {
 		t.Errorf("Expected an OK status for DB. Got %v", dbStatus)
-	}}
+	}
+}
 
 // test that an empty table returns empty products
 func TestEmptyTable(t *testing.T) {
