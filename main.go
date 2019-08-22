@@ -19,5 +19,5 @@ func main() {
 	// use db connection credentials stored in env vars
 	a.Initialize(dbUser, dbPassword, dbName, dbHost, dbPort, dbSSLMode)
 
-	a.Run(":8080")
+	a.Run(":8000")
 }

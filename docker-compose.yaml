@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  rgmp:
+    restart: always
+    hostname: rgmp
+    container_name: rest-go-mux-pq
+    networks:
+      - rgmp
+    build:
+      context: ./docker/rgmp
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: restgomuxpq
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_SSLMODE: disable
+  postgres:
+    restart: always
+    hostname: postgres
+    container_name: postgres
+    networks:
+      - rgmp
+    build:
+      context: ./docker/postgres
+    environment:
+      POSTGRES_PASSWORD: restgomuxpq
+
+networks:
+  rgmp:
