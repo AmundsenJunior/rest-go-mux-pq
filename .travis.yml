@@ -1,0 +1,25 @@
+language: go
+
+go:
+  - 1.12.x
+
+services:
+  - postgresql
+
+env:
+  global:
+    - GO111MODULE=on
+    - TEST_DB_USERNAME=postgres
+    - TEST_DB_PASSWORD=
+    - TEST_DB_NAME=postgres
+    - TEST_DB_HOST=localhost
+    - TEST_DB_PORT=5432
+    - TEST_DB_SSLMODE=disable
+
+before_script:
+  - psql -U postgres -f ./docker/postgres/docker-entrypoint-initdb.d/init-table.sql
+
+script: go mod download && go test -v
+
+notifications:
+  email: false

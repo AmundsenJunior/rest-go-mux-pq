@@ -1,5 +1,7 @@
 # REST API in Go example
 
+[![Build Status](https://travis-ci.org/AmundsenJunior/rest-go-mux-pq.svg?branch=master)](https://travis-ci.org/AmundsenJunior/rest-go-mux-pq)
+
 * gorilla/mux for routing
 * lib/pq PostgreSQL driver
 * docker/lib/postgres as database
